@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+
+  clerkId   String    @unique
+
+  email     String    @unique
+  username  String    @unique
+
+  posts     Post[]
+  comments  Comment[]
+  votes     Vote[]
+
+  memberships CommunityMember[]
+
+  createdAt DateTime  @default(now())
+}
+
+model Community {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  posts     Post[]
+
+  members CommunityMember[]
+  
+  createdAt DateTime  @default(now())
+}
+
+model CommunityMember {
+  id          String    @id @default(cuid())
+
+  userId      String
+  communityId String
+
+  user        User      @relation(fields: [userId], references: [id])
+  community   Community @relation(fields: [communityId], references: [id])
+
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, communityId])
+}
+
+model Post {
+  id          String      @id @default(cuid())
+  title       String
+  content     String
+  imageUrl    String?
+  createdAt   DateTime    @default(now())
+
+  communityId String
+  community   Community   @relation(fields: [communityId], references: [id])
+
+  authorId    String
+  author      User        @relation(fields: [authorId], references: [id])
+
+  comments    Comment[]
+  votes       Vote[]
+}
+
+model Comment {
+  id         String    @id @default(cuid())
+  content    String
+  createdAt  DateTime  @default(now())
+
+  postId     String
+  post       Post      @relation(fields: [postId], references: [id])
+
+  authorId   String
+  author     User      @relation(fields: [authorId], references: [id])
+}
+
+model Vote {
+  id        String    @id @default(cuid())
+  type      VoteType
+
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+
+  postId    String
+  post      Post      @relation(fields: [postId], references: [id])
+
+  @@unique([userId, postId])
+}
+
+enum VoteType {
+  UP
+  DOWN
+}
