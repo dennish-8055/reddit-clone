@@ -13,7 +13,7 @@
 # 🌐 Live Demo
 
 **Live Website:**  
-https://reddit-clone-rho-liard.vercel.app
+https://reddit-clone-nu-virid.vercel.app/
 
 ---
 
